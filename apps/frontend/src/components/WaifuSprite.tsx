@@ -116,18 +116,6 @@ const WaifuSprite: React.FC<WaifuSpriteProps> = ({
         <img src={blushSrc} alt="blush" draggable={false} style={{ ...layerStyle, zIndex: 25 }} />
         <img src={expressionSrc} alt="expression" draggable={false} style={{ ...layerStyle, zIndex: 30 }} />
       </div>
-
-      {/* Emotion label pill */}
-      <div className="mt-4 px-4 py-1.5 rounded-full bg-white/60 backdrop-blur-sm border border-pink-200 shadow-sm">
-        <span className="text-sm font-medium text-pink-600 capitalize tracking-wide">
-          {emotion}
-        </span>
-        {isTalking && (
-          <span className="ml-2 inline-block text-xs text-purple-500 animate-pulse">
-            💬 talking…
-          </span>
-        )}
-      </div>
     </div>
   );
 };

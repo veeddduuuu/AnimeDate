@@ -1,36 +1,137 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import WaifuSprite from './components/WaifuSprite';
-import ChatInterface from './components/ChatInterface';
+import { determineEmotion, getWaifuResponse } from './utils/chat';
+
+type Message = {
+  id: string;
+  sender: 'user' | 'waifu';
+  text: string;
+};
 
 function App() {
   const [emotion, setEmotion] = useState('normal');
   const [isTalking, setIsTalking] = useState(false);
+  
+  const [messages, setMessages] = useState<Message[]>([
+    { id: '1', sender: 'waifu', text: 'H-hello there! I am ready to chat~' }
+  ]);
+  const [input, setInput] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleEmotionChange = (nextEmotion: string) => {
-    setEmotion(nextEmotion);
-    setIsTalking(true);
-
-    // Stop talking after the response has been "delivered"
-    setTimeout(() => setIsTalking(false), 2000);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSend = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      sender: 'user',
+      text: input.trim()
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+
+    // Simulate thinking and auto-change emotion based on input
+    setTimeout(() => {
+      const nextEmotion = determineEmotion(userMessage.text);
+      setEmotion(nextEmotion);
+      setIsTalking(true);
+      
+      const waifuResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        sender: 'waifu',
+        text: getWaifuResponse(nextEmotion)
+      };
+      setMessages(prev => [...prev, waifuResponse]);
+
+      // Stop talking after a short delay
+      setTimeout(() => setIsTalking(false), 2000);
+    }, 800);
+  };
+
+  const latestWaifuMessage = [...messages].reverse().find(m => m.sender === 'waifu');
+
   return (
-    <div className="min-h-screen bg-pink-100 bg-gradient-to-br from-pink-50 to-purple-100 flex items-center justify-center p-4">
+    <div className="flex flex-col md:flex-row h-screen bg-pink-100 bg-gradient-to-br from-pink-50 to-purple-100 overflow-hidden font-sans">
       {/* Background decorative elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
-        <div className="absolute top-1/2 right-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 right-1/4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
-      <div className="relative w-full max-w-5xl flex flex-col md:flex-row items-center gap-8 md:gap-16 z-10">
-        {/* Waifu Section */}
-        <div className="flex-1 w-full max-w-sm md:max-w-none">
+      {/* Main Area: Waifu Sprite & Input Box */}
+      <div className="flex-1 flex flex-col items-center justify-end relative z-10">
+        
+        {/* Floating Comic Bubble for Waifu Message */}
+        {latestWaifuMessage && (
+          <div className="absolute top-16 md:top-24 left-1/2 transform -translate-x-1/2 md:translate-x-12 bg-white border-2 border-pink-300 p-4 rounded-3xl shadow-xl max-w-xs z-40 animate-[bounce_2s_infinite]">
+             <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 border-[12px] border-transparent border-t-white z-10"></div>
+             <div className="absolute -bottom-[20px] left-1/2 transform -translate-x-1/2 border-[14px] border-transparent border-t-pink-300 -z-10"></div>
+             <p className="text-gray-800 font-medium text-lg text-center leading-snug">
+               {latestWaifuMessage.text}
+             </p>
+          </div>
+        )}
+
+        {/* Waifu Sprite */}
+        <div className="flex flex-col items-center justify-end w-full">
           <WaifuSprite emotion={emotion} isTalking={isTalking} />
         </div>
 
-        {/* Chat Section */}
-        <div className="flex-1 w-full max-w-sm md:max-w-none">
-          <ChatInterface onEmotionChange={handleEmotionChange} />
+        {/* Text Input Box (Bottom Middle) */}
+        <div className="w-full max-w-md px-4 -mt-2 mb-6 z-20">
+          <form onSubmit={handleSend} className="flex gap-2 p-2 bg-white/90 backdrop-blur-md border border-pink-300 rounded-full shadow-2xl">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Say something cute..."
+              className="flex-1 bg-transparent px-4 py-3 focus:outline-none text-gray-700 placeholder-pink-400 font-medium"
+            />
+            <button 
+              type="submit"
+              className="bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-md transform hover:scale-105 transition-all focus:outline-none flex-shrink-0"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 rotate-90 translate-x-0.5 translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Right Sidebar: Chat History */}
+      <div className="w-full md:w-80 lg:w-96 bg-white/50 backdrop-blur-md border-l border-pink-200 flex flex-col h-1/2 md:h-full shadow-2xl z-20 transition-all">
+        <div className="bg-gradient-to-r from-pink-300 to-purple-300 p-4 text-white text-center font-bold text-xl tracking-wide shadow-sm z-10 flex-shrink-0">
+          ✨ Chat History ✨
+        </div>
+        
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
+          {messages.map((msg) => (
+            <div 
+              key={msg.id} 
+              className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-[fadeIn_0.3s_ease-out]`}
+            >
+              <div 
+                className={`max-w-[85%] p-3 rounded-2xl text-md ${
+                  msg.sender === 'user' 
+                    ? 'bg-purple-400 text-white rounded-br-sm shadow-md' 
+                    : 'bg-white text-gray-800 rounded-bl-sm shadow-md border border-pink-100'
+                }`}
+              >
+                {msg.text}
+              </div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
         </div>
       </div>
     </div>
