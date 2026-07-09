@@ -4,8 +4,6 @@ import { useState, useEffect, useMemo } from 'react';
 type Emotion =
   | 'normal'
   | 'Smile'
-  | 'Delighted'
-  | 'Laugh'
   | 'Sad'
   | 'Angry'
   | 'Annoyed'
@@ -72,22 +70,21 @@ const WaifuSprite: React.FC<WaifuSpriteProps> = ({
     return () => clearInterval(id);
   }, [isTalking]);
 
-  // ── Emotion Mapping & Expression ──────────────────────────────────────────
-  // Map missing or specific emotions to the actual assets
-  const EMOTION_MAP: Record<string, string> = {
-    'Delighted': 'Smile',
-    'Laugh': 'Smile',
-    'Smile 2': 'Smile',
-    'normal': 'talk' // 'talk' maps to talk-mouth-open/close
-  };
-  const mappedEmotion = EMOTION_MAP[emotion as string] || emotion;
+  // ── Expression Logic ──────────────────────────────────────────────────────
+  let normalizedEmotion = emotion as string;
+  // Fallback for legacy state that might still be in the browser
+  if (['Delighted', 'Laugh', 'Smile 2'].includes(normalizedEmotion)) {
+    normalizedEmotion = 'Smile';
+  }
+  
+  let expressionSrc = `${BASE}/${normalizedEmotion}.png`;
 
-  // If the emotion is animated ('Smile' or 'talk'), use the open/close set.
-  // Otherwise, use the static expression image.
-  let expressionSrc = `${BASE}/${mappedEmotion}.png`;
-  if (mappedEmotion === 'Smile' || mappedEmotion === 'talk') {
+  if (normalizedEmotion === 'Smile') {
     const state = (isTalking && mouthOpen) ? 'open' : 'close';
-    expressionSrc = `${BASE}/${mappedEmotion}-mouth-${state}.png`;
+    expressionSrc = `${BASE}/Smile-mouth-${state}.png`;
+  } else if (normalizedEmotion === 'normal') {
+    const state = (isTalking && mouthOpen) ? 'open' : 'close';
+    expressionSrc = `${BASE}/talk-mouth-${state}.png`;
   }
 
   // ── Base Images ───────────────────────────────────────────────────────────
