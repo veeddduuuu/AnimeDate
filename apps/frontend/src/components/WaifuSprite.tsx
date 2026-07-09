@@ -27,10 +27,11 @@ const BASE = '/assets_model1';
 const NATIVE_W = 1011;
 const NATIVE_H = 1186; // matches Base Body — tallest layer
 
-// Display size — proportionally scaled
-const DISPLAY_WIDTH = 400;
+// Display size — proportionally scaled (increased size)
+const DISPLAY_WIDTH = 500;
 const SCALE = DISPLAY_WIDTH / NATIVE_W;
-const DISPLAY_HEIGHT = Math.round(NATIVE_H * SCALE);
+// Crop a bit from the bottom as requested (e.g., 15px at display scale)
+const DISPLAY_HEIGHT = Math.round(NATIVE_H * SCALE) - 15;
 
 // ─── Layer catalogues ────────────────────────────────────────────────────────
 const OUTFITS = [
@@ -116,9 +117,23 @@ const WaifuSprite: React.FC<WaifuSpriteProps> = ({
   const hairBackSrc = `${BASE}/${hairColor}-back.png`;
   const hairFrontSrc = `${BASE}/${hairColor}-front.png`;
   const outfitSrc = `${BASE}/${outfit}.png`;
-  const eyesSrc = `${BASE}/${emotion}.png`;
-  const mouthSrc = `${BASE}/talk-mouth-${mouthOpen ? 'open' : 'close'}.png`;
   const blushSrc = `${BASE}/blush-less.png`;
+
+  // Map emotions that don't exist in the new folder to something that does
+  let mappedEmotion = emotion;
+  if (['Delighted', 'Laugh', 'Smile 2'].includes(emotion as string)) {
+    mappedEmotion = 'Smile';
+  }
+
+  // Determine the single expression layer (eyes + mouth are combined in these files)
+  let expressionSrc = `${BASE}/${mappedEmotion}.png`; 
+  
+  // If the emotion has an animated open/close set, use it. Otherwise it stays static.
+  if (mappedEmotion === 'Smile') {
+    expressionSrc = `${BASE}/Smile-mouth-${(isTalking && mouthOpen) ? 'open' : 'close'}.png`;
+  } else if (mappedEmotion === 'normal') {
+    expressionSrc = `${BASE}/talk-mouth-${(isTalking && mouthOpen) ? 'open' : 'close'}.png`;
+  }
 
   // Resolve the correct style for the current outfit
   const outfitStyle = OUTFIT_HEIGHTS[outfit] ?? STYLE_1145;
@@ -142,8 +157,7 @@ const WaifuSprite: React.FC<WaifuSpriteProps> = ({
           z-10  Outfit
           z-20  Hair front
           z-25  Blush
-          z-30  Eyes / Expression
-          z-40  Mouth
+          z-30  Expression (Face + Mouth combined)
         */}
 
         {/* z-0  · Hair back (behind the body) */}
@@ -166,17 +180,9 @@ const WaifuSprite: React.FC<WaifuSpriteProps> = ({
         <img src={blushSrc} alt="blush" draggable={false}
           style={{ ...STYLE_1145, zIndex: 25 }} />
 
-        {/* z-30 · Eyes / Expression */}
-        <img src={eyesSrc} alt={`${emotion} eyes`} draggable={false}
+        {/* z-30 · Expression (Face + Mouth) */}
+        <img src={expressionSrc} alt={`${emotion} expression`} draggable={false}
           style={{ ...STYLE_1145, zIndex: 30 }} />
-
-        {/* z-40 · Mouth (talking animation) */}
-        {isTalking && (
-          <img src={mouthSrc}
-            alt={`mouth ${mouthOpen ? 'open' : 'closed'}`}
-            draggable={false}
-            style={{ ...STYLE_1145, zIndex: 40 }} />
-        )}
       </div>
 
       {/* Emotion label pill */}
