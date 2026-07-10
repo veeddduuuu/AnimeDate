@@ -15,6 +15,7 @@ type WaifuSpriteProps = {
   emotion?: Emotion | string;
   isTalking?: boolean;
   isThinking?: boolean;
+  isRizzed?: boolean;
 };
 
 // ─── Asset Config ────────────────────────────────────────────────────────────
@@ -55,6 +56,7 @@ const WaifuSprite: React.FC<WaifuSpriteProps> = ({
   emotion = 'normal',
   isTalking = false,
   isThinking = false,
+  isRizzed = false,
 }) => {
   const [mouthOpen, setMouthOpen] = useState(false);
 
@@ -96,7 +98,7 @@ const WaifuSprite: React.FC<WaifuSpriteProps> = ({
   const hairBackSrc = `${BASE}/${hairColor}-back.png`;
   const hairFrontSrc = `${BASE}/${hairColor}-front.png`;
   const outfitSrc = `${BASE}/${outfit}.png`;
-  const blushSrc = `${BASE}/blush-less.png`;
+  const blushSrc = isRizzed ? `${BASE}/blush-high.png` : `${BASE}/blush-less.png`;
 
   return (
     <div className="flex flex-col items-center justify-center w-full">

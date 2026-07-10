@@ -15,6 +15,7 @@ app.add_middleware(
 
 class ChatRequest(BaseModel):
     message: str
+    session_id: str = "default"
 
 @app.get("/")
 def read_root():
@@ -30,7 +31,7 @@ def chat_endpoint(request: ChatRequest):
     #         "emotion": "Annoyed"
     #     }
         
-    response = get_chat_response(request.message)
+    response = get_chat_response(request.message, session_id=request.session_id)
     return response
 
 from memory import clear_memory

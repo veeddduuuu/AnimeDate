@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import WaifuSprite from './components/WaifuSprite';
 import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedText from './components/AnimatedText';
@@ -13,9 +13,14 @@ function App() {
   const [emotion, setEmotion] = useState('normal');
   const [isTalking, setIsTalking] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
+  const [isRizzed, setIsRizzed] = useState(false);
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
+  
+  const audioRef = useRef<HTMLAudioElement>(null);
+  
+  const sessionId = useMemo(() => Math.random().toString(36).substring(7), []);
 
   const handleClearMemory = async () => {
     if (!window.confirm("Are you sure you want to clear her memory?")) return;
@@ -45,16 +50,24 @@ function App() {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsThinking(true);
+    setIsRizzed(false); // Reset rizz on next turn
 
     try {
       const res = await fetch('http://localhost:8000/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userText })
+        body: JSON.stringify({ message: userText, session_id: sessionId })
       });
       const data = await res.json();
       
       setEmotion(data.emotion);
+      setIsRizzed(data.is_rizzed || false);
+      
+      if (data.is_rizzed && audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.volume = 1.0;
+        audioRef.current.play().catch(e => console.error("Audio play failed:", e));
+      }
       
       const waifuResponse: Message = {
         id: (Date.now() + 1).toString(),
@@ -86,6 +99,8 @@ function App() {
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
         <div className="absolute top-1/2 right-1/4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
+      
+      <audio ref={audioRef} src="/rizz.mp3" preload="auto" />
 
       <button 
         onClick={handleClearMemory}
@@ -124,7 +139,7 @@ function App() {
 
         {/* Waifu Sprite */}
         <div className="flex flex-col items-center justify-end w-full">
-          <WaifuSprite emotion={emotion} isTalking={isTalking} isThinking={isThinking} />
+          <WaifuSprite emotion={emotion} isTalking={isTalking} isThinking={isThinking} isRizzed={isRizzed} />
         </div>
 
         {/* Text Input Box (Bottom Middle) */}
