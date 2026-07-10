@@ -8,7 +8,7 @@ type Emotion =
   | 'Angry'
   | 'Annoyed'
   | 'Shocked'
-  | 'Sleepy'
+  | 'Bored'
   | 'Smug';
 
 type WaifuSpriteProps = {
@@ -73,28 +73,22 @@ const WaifuSprite: React.FC<WaifuSpriteProps> = ({
   }, [isTalking]);
 
   // ── Expression Logic ──────────────────────────────────────────────────────
-  let normalizedEmotion = (emotion as string || 'normal').trim();
-  
-  // Ensure correct casing for Linux filesystem
-  if (normalizedEmotion.toLowerCase() === 'normal') {
-    normalizedEmotion = 'normal';
-  } else {
-    normalizedEmotion = normalizedEmotion.charAt(0).toUpperCase() + normalizedEmotion.slice(1).toLowerCase();
-  }
+  let normalizedEmotion = (emotion as string || 'normal').trim().toLowerCase();
 
   // Fallback for legacy state that might still be in the browser
-  if (['Delighted', 'Laugh', 'Smile 2'].includes(normalizedEmotion)) {
-    normalizedEmotion = 'Smile';
+  if (['delighted', 'laugh', 'smile 2'].includes(normalizedEmotion)) {
+    normalizedEmotion = 'smile';
   }
   
-  let expressionSrc = `${BASE}/${normalizedEmotion}.png`;
+  const state = (isTalking && mouthOpen) ? 'open' : 'close';
+  let expressionSrc = '';
 
-  if (normalizedEmotion === 'Smile') {
-    const state = (isTalking && mouthOpen) ? 'open' : 'close';
-    expressionSrc = `${BASE}/Smile-mouth-${state}.png`;
-  } else if (normalizedEmotion === 'normal') {
-    const state = (isTalking && mouthOpen) ? 'open' : 'close';
-    expressionSrc = `${BASE}/talk-mouth-${state}.png`;
+  if (normalizedEmotion === 'angry') {
+    expressionSrc = `${BASE}/Angry.png`;
+  } else if (normalizedEmotion === 'shocked') {
+    expressionSrc = `${BASE}/Shocked.png`;
+  } else {
+    expressionSrc = `${BASE}/${normalizedEmotion}-${state}.png`;
   }
 
   // ── Base Images ───────────────────────────────────────────────────────────
