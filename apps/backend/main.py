@@ -34,8 +34,10 @@ def chat_endpoint(request: ChatRequest):
     return response
 
 from memory import clear_memory
+from agent import clear_short_term_memory
 
 @app.post("/api/clear-memory")
 def clear_memory_endpoint():
     clear_memory()
+    clear_short_term_memory()
     return {"status": "success"}

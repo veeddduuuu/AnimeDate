@@ -26,7 +26,7 @@ const BASE = '/assets_model1';
 const NATIVE_W = 1011;
 const NATIVE_H = 1186; // Tallest layer (Base Body) for container bounding
 
-const DISPLAY_WIDTH = 500;
+const DISPLAY_WIDTH = 550;
 const SCALE = DISPLAY_WIDTH / NATIVE_W;
 // Crop more from the bottom (e.g., 60px at display scale)
 const DISPLAY_HEIGHT = Math.round(NATIVE_H * SCALE) - 20;

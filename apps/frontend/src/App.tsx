@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import WaifuSprite from './components/WaifuSprite';
 import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedText from './components/AnimatedText';
@@ -16,11 +16,6 @@ function App() {
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   const handleClearMemory = async () => {
     if (!window.confirm("Are you sure you want to clear her memory?")) return;
@@ -34,9 +29,7 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -156,32 +149,7 @@ function App() {
         </div>
       </div>
 
-      {/* Right Sidebar: Chat History */}
-      <div className="w-full md:w-80 lg:w-96 bg-white/50 backdrop-blur-md border-l border-pink-200 flex flex-col h-1/2 md:h-full shadow-2xl z-20 transition-all">
-        <div className="bg-gradient-to-r from-pink-300 to-purple-300 p-4 text-white text-center font-bold text-xl tracking-wide shadow-sm z-10 flex-shrink-0">
-          ✨ Chat History ✨
-        </div>
-        
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
-          {messages.map((msg) => (
-            <div 
-              key={msg.id} 
-              className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-[fadeIn_0.3s_ease-out]`}
-            >
-              <div 
-                className={`max-w-[85%] p-3 rounded-2xl text-md ${
-                  msg.sender === 'user' 
-                    ? 'bg-purple-400 text-white rounded-br-sm shadow-md' 
-                    : 'bg-white text-gray-800 rounded-bl-sm shadow-md border border-pink-100'
-                }`}
-              >
-                {msg.text}
-              </div>
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
+
     </div>
   );
 }
