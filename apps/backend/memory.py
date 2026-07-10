@@ -41,3 +41,16 @@ def retrieve_memory(query: str, k: int = 3) -> str:
     except Exception as e:
         print(f"Error retrieving memory: {e}")
         return "No previous relevant memories."
+
+def clear_memory():
+    global vector_store
+    try:
+        vector_store.delete_collection()
+        # Re-instantiate to re-create the collection for future inserts
+        vector_store = PGVector(
+            connection_string=CONNECTION_STRING,
+            embedding_function=embeddings,
+            collection_name=COLLECTION_NAME,
+        )
+    except Exception as e:
+        print(f"Error clearing memory: {e}")

@@ -32,3 +32,10 @@ def chat_endpoint(request: ChatRequest):
         
     response = get_chat_response(request.message)
     return response
+
+from memory import clear_memory
+
+@app.post("/api/clear-memory")
+def clear_memory_endpoint():
+    clear_memory()
+    return {"status": "success"}

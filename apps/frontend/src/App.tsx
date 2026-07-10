@@ -14,14 +14,24 @@ function App() {
   const [isTalking, setIsTalking] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   
-  const [messages, setMessages] = useState<Message[]>([
-    { id: '1', sender: 'waifu', text: 'H-hello there! I am ready to chat~' }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleClearMemory = async () => {
+    if (!window.confirm("Are you sure you want to clear her memory?")) return;
+    try {
+      await fetch('http://localhost:8000/api/clear-memory', { method: 'POST' });
+      setMessages([]);
+      alert("Memory wiped!");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to clear memory");
+    }
   };
 
   useEffect(() => {
@@ -83,6 +93,13 @@ function App() {
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
         <div className="absolute top-1/2 right-1/4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
+
+      <button 
+        onClick={handleClearMemory}
+        className="absolute top-4 right-4 z-50 bg-red-400 hover:bg-red-500 text-white text-xs font-bold py-2 px-4 rounded-full shadow-md transition-all"
+      >
+        Clear Memory
+      </button>
 
       {/* Main Area: Waifu Sprite & Input Box */}
       <div className="flex-1 flex flex-col items-center justify-end relative z-10">
