@@ -71,7 +71,15 @@ const WaifuSprite: React.FC<WaifuSpriteProps> = ({
   }, [isTalking]);
 
   // ── Expression Logic ──────────────────────────────────────────────────────
-  let normalizedEmotion = emotion as string;
+  let normalizedEmotion = (emotion as string || 'normal').trim();
+  
+  // Ensure correct casing for Linux filesystem
+  if (normalizedEmotion.toLowerCase() === 'normal') {
+    normalizedEmotion = 'normal';
+  } else {
+    normalizedEmotion = normalizedEmotion.charAt(0).toUpperCase() + normalizedEmotion.slice(1).toLowerCase();
+  }
+
   // Fallback for legacy state that might still be in the browser
   if (['Delighted', 'Laugh', 'Smile 2'].includes(normalizedEmotion)) {
     normalizedEmotion = 'Smile';

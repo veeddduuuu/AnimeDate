@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import WaifuSprite from './components/WaifuSprite';
 import { motion, AnimatePresence } from 'framer-motion';
+import AnimatedText from './components/AnimatedText';
 
 type Message = {
   id: string;
@@ -84,19 +85,10 @@ function App() {
       <div className="flex-1 flex flex-col items-center justify-end relative z-10">
         
         {/* Reply Text above Waifu's Head */}
-        <div className="absolute top-8 md:top-12 left-0 w-full flex justify-center z-40 px-4">
+        <div className="absolute top-2 md:top-4 left-0 w-full flex justify-center z-40 px-4">
           <AnimatePresence mode="wait">
             {latestWaifuMessage && (
-              <motion.p
-                key={latestWaifuMessage.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                className="text-pink-600 font-bold text-xl md:text-2xl text-center leading-snug drop-shadow-[0_0_15px_rgba(255,255,255,1)] max-w-md"
-              >
-                {latestWaifuMessage.text}
-              </motion.p>
+              <AnimatedText key={latestWaifuMessage.id} text={latestWaifuMessage.text} />
             )}
           </AnimatePresence>
         </div>
