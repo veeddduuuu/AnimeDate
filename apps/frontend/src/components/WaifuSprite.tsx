@@ -44,9 +44,8 @@ const layerStyle: React.CSSProperties = {
   position: 'absolute',
   top: 0,
   left: 0,
-  width: `${DISPLAY_WIDTH}px`,
+  width: '100%',
   height: 'auto',
-  maxWidth: 'none',
   display: 'block',
   pointerEvents: 'none',
 };
@@ -106,8 +105,9 @@ const WaifuSprite: React.FC<WaifuSpriteProps> = ({
       <div
         style={{
           position: 'relative',
-          width: `${DISPLAY_WIDTH}px`,
-          height: `${DISPLAY_HEIGHT}px`,
+          width: '100%',
+          maxWidth: `${DISPLAY_WIDTH}px`,
+          aspectRatio: `${DISPLAY_WIDTH} / ${DISPLAY_HEIGHT}`,
           margin: '0 auto',
           overflow: 'hidden',
         }}

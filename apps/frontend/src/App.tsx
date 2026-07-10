@@ -14,12 +14,12 @@ function App() {
   const [isTalking, setIsTalking] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [isRizzed, setIsRizzed] = useState(false);
-  
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  
+
   const audioRef = useRef<HTMLAudioElement>(null);
-  
+
   const sessionId = useMemo(() => Math.random().toString(36).substring(7), []);
 
   const handleClearMemory = async () => {
@@ -46,7 +46,7 @@ function App() {
       sender: 'user',
       text: userText
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsThinking(true);
@@ -59,16 +59,16 @@ function App() {
         body: JSON.stringify({ message: userText, session_id: sessionId })
       });
       const data = await res.json();
-      
+
       setEmotion(data.emotion);
       setIsRizzed(data.is_rizzed || false);
-      
+
       if (data.is_rizzed && audioRef.current) {
         audioRef.current.currentTime = 0;
         audioRef.current.volume = 1.0;
         audioRef.current.play().catch(e => console.error("Audio play failed:", e));
       }
-      
+
       const waifuResponse: Message = {
         id: (Date.now() + 1).toString(),
         sender: 'waifu',
@@ -99,10 +99,10 @@ function App() {
         <div className="absolute -top-20 -left-20 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
         <div className="absolute top-1/2 right-1/4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
-      
+
       <audio ref={audioRef} src="/rizz.mp3" preload="auto" />
 
-      <button 
+      <button
         onClick={handleClearMemory}
         className="absolute top-4 right-4 z-50 bg-red-400 hover:bg-red-500 text-white text-xs font-bold py-2 px-4 rounded-full shadow-md transition-all"
       >
@@ -111,9 +111,9 @@ function App() {
 
       {/* Main Area: Waifu Sprite & Input Box */}
       <div className="flex-1 flex flex-col items-center justify-end relative z-10">
-        
+
         {/* Reply Text above Waifu's Head */}
-        <div className="absolute top-2 md:top-4 left-0 w-full flex justify-center z-40 px-4 h-16">
+        <div className="w-full flex justify-center z-40 px-4 min-h-[4rem] -mb-12">
           <AnimatePresence mode="wait">
             {isThinking ? (
               <motion.div
@@ -128,9 +128,9 @@ function App() {
                 <motion.div animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.3 }} className="w-3 h-3 bg-pink-400 rounded-full shadow-sm" />
               </motion.div>
             ) : latestWaifuMessage ? (
-              <AnimatedText 
-                key={latestWaifuMessage.id} 
-                text={latestWaifuMessage.text} 
+              <AnimatedText
+                key={latestWaifuMessage.id}
+                text={latestWaifuMessage.text}
                 onComplete={() => setIsTalking(false)}
               />
             ) : null}
@@ -152,7 +152,7 @@ function App() {
               placeholder="Say something cute..."
               className="flex-1 bg-transparent px-4 py-3 focus:outline-none text-gray-700 placeholder-pink-400 font-medium"
             />
-            <button 
+            <button
               type="submit"
               className="bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-md transform hover:scale-105 transition-all focus:outline-none flex-shrink-0"
             >
